@@ -21,6 +21,7 @@ import axios from "axios";
 import { useAuth } from "../../Context/Auth";
 import { useQuery } from "@tanstack/react-query";
 import { useState,useEffect } from "react";
+import Skeleton from "@mui/material/Skeleton";
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
   ...theme.typography.body2,
@@ -58,7 +59,7 @@ const BlogsByCategory = () => {
   // Fetching blogs based on category
   const fetchBlogs = async () => {
   const response = await axios.get(
-    `https://restapinodejs.onrender.com/api/category/post/${categoryId}`,
+    `${process.env.React_App_API_BASE_URL}/category/post/${categoryId}`,
     {
       headers: {
         "x-access-token": auth?.token,
@@ -81,7 +82,7 @@ const BlogsByCategory = () => {
   const fetchBlogImage = async (blog) => {
     try {
       const response = await axios.get(
-        `https://restapinodejs.onrender.com/api/blog/image/${blog?._id}`,
+        `${process.env.React_App_API_BASE_URL}/blog/image/${blog?._id}`,
         {
           headers: {
             "x-access-token": auth?.token,
@@ -145,12 +146,21 @@ const BlogsByCategory = () => {
                             }}
                           />
                           <StyledTableCell align="center">
-                            <CardMedia
-                              component="img"
-                              src={blogsImage[blog._id]}
-                              alt={blog.title}
-                              style={{ width: "250px", height: "200px", objectFit: "contain" }}
-                            />
+                            {blogsImage[blog._id] ? (
+                              <CardMedia
+                                component="img"
+                                src={blogsImage[blog._id]}
+                                alt={blog.title}
+                                style={{
+                                  width: "250px",
+                                  height: "200px",
+                                  objectFit: "contain",
+                                }}
+                              />
+                            ) : (
+                              // Show Skeleton while image is loading
+                              <Skeleton variant="rectangular" width={250} height={200} />
+                            )}
                           </StyledTableCell>
                           <StyledTableCell align="center">
                             <Link to={`/blog-details/${blog._id}`}>

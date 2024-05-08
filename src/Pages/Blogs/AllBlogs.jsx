@@ -54,7 +54,7 @@ const AllBlogs = () => {
   // Fetch all blogs
   const fetchBlogs = async () => {
     const response = await axios.get(
-      "https://restapinodejs.onrender.com/api/allBlog",
+      `${process.env.React_App_API_BASE_URL}/allBlog`,
       {
         headers: {
           "x-access-token": auth?.token,
@@ -76,10 +76,10 @@ const AllBlogs = () => {
 
   // Function for fetching Image
 
-  const fetchCourseImage = async (blog) => {
+  const fetchBlogsImage = async (blog) => {
     try {
       const response = await axios.get(
-        `https://restapinodejs.onrender.com/api/blog/image/${blog?._id}`,
+        `${process.env.React_App_API_BASE_URL}/blog/image/${blog?._id}`,
         {
           headers: {
             "x-access-token": auth?.token,
@@ -101,7 +101,7 @@ const AllBlogs = () => {
   useEffect(() => {
     if (blogs) {
       blogs?.map((blog) => {
-        fetchCourseImage(blog);
+        fetchBlogsImage(blog);
       });
     }
   }, [blogs, auth?.token]);

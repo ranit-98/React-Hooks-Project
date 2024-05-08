@@ -57,7 +57,7 @@ const Course = () => {
 
     try {
       const response =course._id && await axios.get(
-        `https://restapinodejs.onrender.com/api/course/photo/${course._id}`,
+        `${process.env.React_App_API_BASE_URL}/course/photo/${course._id}`,
         {
           headers: {
             "x-access-token": auth?.token,

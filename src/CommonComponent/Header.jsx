@@ -18,7 +18,7 @@ import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 
 // Constants
-const INITIAL_PAGES = ["Home","Blogs", "LogIn", "Register","Team","Testimonial","Contact"];
+const INITIAL_PAGES = ["Home","Blogs","Team","Testimonial","Contact", "LogIn", "Register"];
 const AUTH_PAGES = ["Home","Blogs","Team","Testimonial","Course","Contact"];
 const SETTINGS = ["Profile", "Update Password", "Logout"];
 
@@ -153,17 +153,19 @@ function ResponsiveAppBar() {
           </Typography>
 
           {/* Desktop Navigation Menu */}
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" },justifyContent: "flex-end" }}>
             {pages.map((page) => (
+              <>
               <Button
                 key={page}
                 component={Link}
                 to={`/${page.toLowerCase()}`}
                 onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: "white", display: "block" }}
+                sx={{ my: 2, color: "white", display: "block" ,textDecoration:"none"}}
               >
                 {page}
               </Button>
+              </>
             ))}
           </Box>
 

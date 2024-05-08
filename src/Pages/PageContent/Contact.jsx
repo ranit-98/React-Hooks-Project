@@ -25,7 +25,8 @@ const Contact = () => {
         message:data.message
    }
    try{
-        const res=await axios.post(`https://restapinodejs.onrender.com/api/contact/create`,upData)
+        // const res=await axios.post(`https://restapinodejs.onrender.com/api/contact/create`,upData)
+       const res=await axios.post(`${process.env.React_App_API_BASE_URL}/contact/create`,upData)
         toast.success(res?.data?.message)
         reset()
    }catch(error){

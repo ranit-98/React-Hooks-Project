@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../../CommonComponent/Layout";
 import { useAuth } from "../../Context/Auth";
 import axios from "axios";
@@ -14,7 +14,6 @@ import WriteComment from "./WriteComment";
 import Button from "@mui/material/Button";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
-
 import RingLoader from "react-spinners/RingLoader";
 const BlogDetails = () => {
   const { id } = useParams();
@@ -22,7 +21,7 @@ const BlogDetails = () => {
   // Function to fetch blog details
   const getBlogDetails = async () => {
     const response = await axios.get(
-      `https://restapinodejs.onrender.com/api/blogdetails/${id}`,
+      `${process.env.React_App_API_BASE_URL}/blogdetails/${id}`,
       {
         headers: {
           "x-access-token": auth?.token,
@@ -41,7 +40,7 @@ const BlogDetails = () => {
   // Function to fetch the image for the blog
   const fetchImage = async () => {
     const response = await axios.get(
-      `https://restapinodejs.onrender.com/api/blog/image/${id}`,
+      `${process.env.React_App_API_BASE_URL}/blog/image/${id}`,
       {
         headers: {
           "x-access-token": auth?.token,
@@ -71,7 +70,7 @@ const BlogDetails = () => {
   //Function to fetch no of Likes
   const getNoOfLikes = async () => {
     const res = await axios.put(
-      `https://restapinodejs.onrender.com/api/blog/like/${id}`,
+      `${process.env.React_App_API_BASE_URL}/blog/like/${id}`,
       {},
       {
         headers: {
@@ -79,6 +78,8 @@ const BlogDetails = () => {
         },
       }
     );
+
+    getBlogDetails();
     if (res.status === 200) {
       return res?.data;
     } else {
@@ -87,7 +88,11 @@ const BlogDetails = () => {
   };
 
   //Use React Query to fetch no of Likes
-  const { data: likes, error: likesError } = useQuery({
+  const {
+    data: likes,
+    error: likesError,
+    refetch: refetchLikes,
+  } = useQuery({
     queryKey: ["likes"],
     queryFn: getNoOfLikes,
   });
@@ -95,7 +100,7 @@ const BlogDetails = () => {
   //Function to fetch no of Dislikes
   const getNoOfDislikes = async () => {
     const res = await axios.put(
-      `https://restapinodejs.onrender.com/api/blog/unlike/${id}`,
+      `${process.env.React_App_API_BASE_URL}/blog/unlike/${id}`,
       {},
       {
         headers: {
@@ -110,7 +115,7 @@ const BlogDetails = () => {
     }
   };
   //Use React Query to fetch no of Dislikes
-  const { data: dislikes, error: dislikesError } = useQuery({
+  const { data: dislikes, error: dislikesError,refetch: refetchDisLikes } = useQuery({
     queryKey: ["dislike"],
     queryFn: getNoOfDislikes,
   });
@@ -118,7 +123,7 @@ const BlogDetails = () => {
   // Function to fetch comments for the blog post
   const fetchComments = async () => {
     const response = await axios.get(
-      `https://restapinodejs.onrender.com/api/comment/${id}`,
+      `${process.env.React_App_API_BASE_URL}/comment/${id}`,
       {
         headers: {
           "x-access-token": auth?.token,
@@ -142,16 +147,15 @@ const BlogDetails = () => {
   return (
     <Layout>
       {isLoading && (
-        <div style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}>
-        <RingLoader
-          color="#36d7b7"
-          size={150}
-        />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
+          }}
+        >
+          <RingLoader color="#36d7b7" size={150} />
         </div>
       )}
       {!isLoading && (
@@ -199,7 +203,16 @@ const BlogDetails = () => {
               )}
               {/* For Like and Dislike */}
               <Box mt={2}>
-                <Button variant="contained" color="primary">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={async () => {
+                     refetchLikes();
+                    await getNoOfLikes();
+
+                    
+                  }}
+                >
                   <ThumbUpIcon style={{ marginRight: "8px" }} />
                   Like ({likes?.likes})
                 </Button>
@@ -207,23 +220,33 @@ const BlogDetails = () => {
                   variant="contained"
                   color="secondary"
                   style={{ marginLeft: "1rem" }}
+                  onClick={async () => {
+                     // After incrementing the likes, refetch the like count
+                     refetchDisLikes();
+                    // Call the function to increment the likes
+                    await getNoOfDislikes();
+
+                   
+                  }}
                 >
                   <ThumbDownIcon style={{ marginRight: "8px" }} />
                   Dislike ({dislikes?.unlikes})
                 </Button>
               </Box>
-              {/* Add the WriteComment component to allow writing new comments */}
-              <WriteComment
-                blogId={id}
-                auth={auth}
-                onCommentPosted={refetchComments}
-              />
+
               {/* Display comments using the new CommentsSection component */}
               {commentsData && (
                 <CommentsSection
                   comments={commentsData.post.comment.comments}
                 />
               )}
+
+              {/* Add the WriteComment component to allow writing new comments */}
+              <WriteComment
+                blogId={id}
+                auth={auth}
+                onCommentPosted={refetchComments}
+              />
             </Box>
           </Paper>
         </Container>

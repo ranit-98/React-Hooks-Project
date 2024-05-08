@@ -16,7 +16,7 @@ import HourglassLoader from "../../CommonComponent/HourglassLoader";
 const Team = ({ withLayout = true }) => {
   // Function to fetch team data from the API
   const getTeam = async () => {
-    const res = await axios.get(`https://restapinodejs.onrender.com/api/team`);
+    const res = await axios.get(`${process.env.React_App_API_BASE_URL}/team`);
     return res?.data;
   };
 
@@ -51,7 +51,7 @@ const Team = ({ withLayout = true }) => {
                   <CardMedia
                     component="img"
                     height="300"
-                    image={`https://restapinodejs.onrender.com/api/team/photo/${member._id}`}
+                    image={`${process.env.React_App_API_BASE_URL}/team/photo/${member._id}`}
                     alt={member.name}
                   />
                   <CardContent>

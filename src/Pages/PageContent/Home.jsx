@@ -12,7 +12,7 @@ const Home = () => {
   // Function to fetch carousel images and data from the API
   const getCarouselImage = async () => {
     const res = await axios.get(
-      `https://restapinodejs.onrender.com/api/banner`
+      `${process.env.React_App_API_BASE_URL}/banner`
     );
     return res?.data;
   };
@@ -124,3 +124,4 @@ const Home = () => {
 };
 
 export default Home;
+

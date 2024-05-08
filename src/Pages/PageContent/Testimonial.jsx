@@ -10,7 +10,7 @@ import HourglassLoader from "../../CommonComponent/HourglassLoader";
 const Testimonial = ({ withLayout = true }) => {
     // Function to fetch testimonials from the API
     const getTestimonial = async () => {
-        const res = await axios.get(`https://restapinodejs.onrender.com/api/testimonial`);
+        const res = await axios.get(`${process.env.React_App_API_BASE_URL}/testimonial`);
         return res?.data;
     };
 

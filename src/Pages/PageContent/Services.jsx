@@ -23,7 +23,7 @@ const Services = () => {
   // Fuction to get Service data from API
   const getService = async () => {
     const res = await axios.get(
-      `https://restapinodejs.onrender.com/api/service`
+      `${process.env.React_App_API_BASE_URL}/service`
     );
     return res?.data;
   };

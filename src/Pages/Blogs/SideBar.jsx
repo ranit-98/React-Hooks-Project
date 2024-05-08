@@ -1,4 +1,5 @@
-import * as React from "react";
+
+import React,{useEffect} from "react";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
@@ -8,8 +9,8 @@ import { useAuth } from "../../Context/Auth";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { Paper, Box } from "@mui/material";
-import { useState, useEffect } from "react";
 import Skeleton from "@mui/material/Skeleton";
+
 const style = {
   py: 0,
   width: "100%",
@@ -20,16 +21,14 @@ const style = {
   backgroundColor: "background.paper",
 };
 
-
 const SideBar = () => {
-  
   const [auth] = useAuth();
-  // State to manage image URLs for each course
-  const [courseImages, setCourseImages] = useState({});
-  //Function to get Category Details
+  const [courseImages, setCourseImages] = React.useState({});
+  
+  // Function to get all categories
   const getAllCategories = async () => {
     const res = await axios.get(
-      `https://restapinodejs.onrender.com/api/showallcategory`,
+      `${process.env.React_App_API_BASE_URL}/showallcategory`,
       {
         headers: {
           "x-access-token": auth?.token,
@@ -39,20 +38,16 @@ const SideBar = () => {
     return res?.data;
   };
 
-  // React Query Hook to fetch the Category Data
-  const {
-    isLoading,
-    isError,
-    data: categories,
-  } = useQuery({
+  // React Query Hook for categories
+  const { isLoading: categoriesLoading, data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: getAllCategories,
   });
 
-  //Fuction to get the Recent Post Data from API
+  // Function to get recent post data
   const getRecentPost = async () => {
     const response = await axios.get(
-      `https://restapinodejs.onrender.com/api/letest-post`,
+      `${process.env.React_App_API_BASE_URL}/letest-post`,
       {
         headers: {
           "x-access-token": auth?.token,
@@ -62,25 +57,23 @@ const SideBar = () => {
     return response?.data;
   };
 
-  //React Query Hook to fetch the Recent Post Data
+  // React Query Hook for recent posts
   const {
     data: recentPost,
     isLoading: recentPostLoading,
-    isError: recentPostError,
   } = useQuery({
     queryKey: ["recentPost"],
     queryFn: getRecentPost,
   });
 
-  // Function to fetch Recent Post image using the imageId
+  // Function to fetch course images
   const fetchCourseImage = async (course) => {
     if (!course || !course._id) return null;
-    //console.log("recent Post",course?._id);
     try {
       const response =
         course._id &&
         (await axios.get(
-          `https://restapinodejs.onrender.com/api/blog/image/${course?._id}`,
+          `${process.env.React_App_API_BASE_URL}/blog/image/${course?._id}`,
           {
             headers: {
               "x-access-token": auth?.token,
@@ -98,55 +91,50 @@ const SideBar = () => {
       console.error("Error fetching course image:", error);
     }
   };
-  // Fetch course images when course data is available
-  React.useEffect(() => {
+
+  // Use effect to fetch course images when recent posts are available
+  useEffect(() => {
     if (recentPost?.data) {
-      recentPost?.data?.map((course) => {
+      recentPost?.data?.forEach((course) => {
         fetchCourseImage(course);
       });
     }
-  }, [recentPost?.data._id]);
-  //console.log("recent page", recentPost);
+  }, [recentPost?.data]);
 
   return (
     <>
-      <List sx={style}>
-        <ListItem
-          style={{
-            textAlign: "center",
-            color: "white",
-            backgroundColor: "black",
-          }}
-        >
-          <ListItemText primary="Category" />
-        </ListItem>
-        {categories?.data?.map((category) => {
-          return (
+      {categoriesLoading ? (
+        // Skeleton loading for categories
+        <Skeleton variant="rectangular" width="100%" height={450} />
+      ) : (
+        <List sx={style}>
+          <ListItem style={{ textAlign: "center", color: "white", backgroundColor: "black" }}>
+            <ListItemText primary="Category" />
+          </ListItem>
+          {categories?.data?.map((category) => (
             <>
-              <Link
-                style={{ textDecoration: "none", color: "black" }}
-                to={`/category/${category?._id}`}
-              >
+              <Link to={`/category/${category?._id}`} style={{ textDecoration: "none", color: "black" }}>
                 <ListItem style={{ textAlign: "center" }}>
                   <ListItemText primary={category?.category} />
                 </ListItem>
               </Link>
               <Divider component="li" />
             </>
-          );
-        })}
-      </List>
-      <h3 style={{color:"white",backgroundColor:"black"}}>Recent Posts</h3>
-
+          ))}
+        </List>
+      )}
+      
+      <h3 style={{color:"white", backgroundColor:"black"}}>Recent Posts</h3>
+      
       <Box>
-        {recentPost?.data?.map((post, index) => (
-          <Paper
-            key={index}
-            elevation={2}
-            sx={{ marginBottom: 2, padding: 2 }}
-          >
-            <Box>
-            {courseImages[post?._id] ? (
+        {recentPostLoading ? (
+          // Skeleton loading for recent posts
+          <Skeleton variant="rectangular" width="100%" height={300} count={3} />
+        ) : (
+          recentPost?.data?.map((post, index) => (
+            <Paper key={index} elevation={2} sx={{ marginBottom: 2, padding: 2 }}>
+              <Box>
+                {courseImages[post?._id] ? (
                   <img
                     src={courseImages[post?._id]}
                     alt={`Image for ${post?.title}`}
@@ -160,29 +148,24 @@ const SideBar = () => {
                   // Render Skeleton while image is loading
                   <Skeleton variant="rectangular" width="100%" height={200} />
                 )}
-            </Box>
-            <Box sx={{ marginTop: 1 }}>
-              <h6
-                style={{ margin: 0, fontSize: "1.1rem", fontWeight: 600 }}
-              >
-                <Link to={`/blog-details/${post?._id}`} style={{color:"black"}}>
-                  {post?.title}
-                </Link>
-              </h6>
-              <time
-                datetime={post?.date}
-                style={{ fontSize: "0.85rem", color: "#6c757d" }}
-              >
-                {new Date(post?.createdAt).toLocaleDateString()} at {}
-                 {new Date(post?.createdAt).toLocaleTimeString()}
-              </time>
-            </Box>
-          </Paper>
-        ))}
+              </Box>
+              <Box sx={{ marginTop: 1 }}>
+                <h6 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 600 }}>
+                  <Link to={`/blog-details/${post?._id}`} style={{color: "black"}}>
+                    {post?.title}
+                  </Link>
+                </h6>
+                <time style={{ fontSize: "0.85rem", color: "#6c757d" }}>
+                  {new Date(post?.createdAt).toLocaleDateString()} at 
+                  {new Date(post?.createdAt).toLocaleTimeString()}
+                </time>
+              </Box>
+            </Paper>
+          ))
+        )}
       </Box>
     </>
   );
 };
+
 export default SideBar;
-
-
