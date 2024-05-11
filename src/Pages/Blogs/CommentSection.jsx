@@ -76,7 +76,7 @@ const CommentsSection = ({ comments }) => {
           </Typography>
         </Paper>
       ))}
-       <Button variant="contained" onClick={handleLoadMore}>{commentLimit===0?"View Comments":"Load More"}</Button>
+       <Button variant="contained" onClick={handleLoadMore} style={{marginLeft: "1rem",marginTop:"1rem"}}>{commentLimit===0?<><MessageIcon/> View Comments({commentData.length})</>:"Load More"}</Button>
     </Box>
   );
 };

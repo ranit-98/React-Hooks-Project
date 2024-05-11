@@ -119,7 +119,7 @@ const BlogsByCategory = () => {
       {!isLoading && (
         <Container maxWidth="xl" style={{ marginTop: "2rem" }}>
           <Grid container spacing={2}>
-            <Grid item xs={9}>
+            <Grid item xs={12} md={9}>
               <Item>
                 <TableContainer component={Paper}>
                   <Table sx={{ minWidth: 700 }} aria-label="customized table">
@@ -176,7 +176,7 @@ const BlogsByCategory = () => {
                 </TableContainer>
               </Item>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={12} md={3}>
               <Item>
                 <SideBar />
               </Item>

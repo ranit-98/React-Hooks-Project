@@ -206,6 +206,7 @@ const BlogDetails = () => {
                 <Button
                   variant="contained"
                   color="primary"
+                  style={{ marginLeft: "1rem",marginTop:"1rem" }}
                   onClick={async () => {
                      refetchLikes();
                     await getNoOfLikes();
@@ -219,7 +220,7 @@ const BlogDetails = () => {
                 <Button
                   variant="contained"
                   color="secondary"
-                  style={{ marginLeft: "1rem" }}
+                  style={{ marginLeft: "1rem",marginTop:"1rem" }}
                   onClick={async () => {
                      // After incrementing the likes, refetch the like count
                      refetchDisLikes();
@@ -232,14 +233,17 @@ const BlogDetails = () => {
                   <ThumbDownIcon style={{ marginRight: "8px" }} />
                   Dislike ({dislikes?.unlikes})
                 </Button>
-              </Box>
-
-              {/* Display comments using the new CommentsSection component */}
-              {commentsData && (
+               
+                {/* Display comments using the new CommentsSection component */}
+                {commentsData && (
                 <CommentsSection
                   comments={commentsData.post.comment.comments}
                 />
               )}
+              </Box>
+
+            
+            
 
               {/* Add the WriteComment component to allow writing new comments */}
               <WriteComment
